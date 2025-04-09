@@ -1,0 +1,115 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String  @id @default(uuid()) @db.Uuid
+  name     String?
+  email    String  @unique
+  password String
+
+  Form     Form[]
+  Response Response[]
+}
+
+model Form {
+  id                  String     @id @default(uuid()) @db.Uuid
+  userId              String     @db.Uuid
+  user                User       @relation(fields: [userId], references: [id])
+  title               String
+  description         String
+  logoUrl             String?
+  isSinglePage        Boolean    @default(true)
+  noOfPages           Int
+  questions           Question[]
+  styling             Styling?
+  privateSharingToken String?
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+
+  ConditionalLogic ConditionalLogic[]
+  Response         Response[]
+}
+
+model Templates {
+  id                  String     @id @default(uuid()) @db.Uuid
+  title               String
+  description         String
+  logoUrl             String?
+  isSinglePage        Boolean    @default(true)
+  noOfPages           Int
+  questions           Question[]
+  stylingId           String?    @db.Uuid
+  styling             Styling?   @relation(fields: [stylingId], references: [id])
+  privateSharingToken String?
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+}
+
+model Question {
+  id              String     @id @default(uuid()) @db.Uuid
+  formId          String?    @db.Uuid
+  form            Form?      @relation(fields: [formId], references: [id])
+  templateId      String?    @db.Uuid
+  template        Templates? @relation(fields: [templateId], references: [id])
+  pageNumber      Int
+  questionText    String
+  questionOptions String[]
+  validations     String[]
+  questionAnswer  String?
+  questionOrder   Int
+  isRequired      Boolean    @default(false)
+  isHidden        Boolean    @default(false)
+
+  ConditionalLogic ConditionalLogic[]
+  Response         Response[]
+}
+
+model Styling {
+  id         String  @id @default(uuid()) @db.Uuid
+  formId     String  @unique @db.Uuid
+  form       Form    @relation(fields: [formId], references: [id])
+  PageColor  String
+  PageImage  String?
+  formColor  String
+  fontColor  String
+  fontFamily String
+  fontSize   Int
+
+  Templates Templates[]
+}
+
+model ConditionalLogic {
+  id                String   @id @default(uuid()) @db.Uuid
+  formId            String   @db.Uuid
+  form              Form     @relation(fields: [formId], references: [id])
+  questionId        String   @db.Uuid
+  question          Question @relation(fields: [questionId], references: [id])
+  condition_check   String
+  action_questionId String[]
+}
+
+model Response {
+  id             String   @id @default(uuid()) @db.Uuid
+  userId         String   @db.Uuid
+  user           User     @relation(fields: [userId], references: [id])
+  userName       String
+  userEmail      String
+  formId         String   @db.Uuid
+  form           Form     @relation(fields: [formId], references: [id])
+  questionId     String   @db.Uuid
+  question       Question @relation(fields: [questionId], references: [id])
+  responseAnswer String
+  createdAt      DateTime @default(now())
+}
