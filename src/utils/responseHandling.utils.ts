@@ -1,0 +1,21 @@
+import { Response } from 'express';
+import { ZodIssue } from 'zod';
+import { User } from '../modules/auth/types';
+
+export const handleResponse = (
+  res: Response,
+  statusCode: number,
+  message: string,
+  user?: User,
+): void => {
+  res.status(statusCode).json({ message, user });
+};
+
+export const handleError = (
+  res: Response,
+  statusCode: number,
+  message: string,
+  error: Error | ZodIssue[],
+): void => {
+  res.status(statusCode).json({ message, error });
+};

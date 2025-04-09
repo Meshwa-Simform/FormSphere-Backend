@@ -3,13 +3,29 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon --ext ts --exec ts-node src/server.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon --ext ts --exec ts-node src/index.ts",
+    "lint": "eslint . --ext .ts",
+    "format": "prettier --write .",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky install"
+  },
+  "lint-staged": {
+    "*.ts": [
+      "eslint --fix",
+      "prettier --write"
+    ]
   },
   "keywords": [],
-  "author": "",
+  "author": "Meshwa Patel",
   "license": "ISC",
-  "description": "",
+  "description": "A backend service for managing forms and user authentication using Node.js, TypeScript, and Prisma.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Meshwa-Simform/FormSphere-Backend.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Meshwa-Simform/FormSphere-Backend/issues"
+  },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
     "@types/cookie-parser": "^1.4.8",
@@ -17,6 +33,13 @@
     "@types/express": "^5.0.1",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/node": "^22.14.0",
+    "@typescript-eslint/eslint-plugin": "^8.29.1",
+    "@typescript-eslint/parser": "^8.29.1",
+    "eslint": "^9.24.0",
+    "eslint-plugin-prettier": "^5.2.6",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.5.0",
+    "prettier": "^3.5.3",
     "prisma": "^6.6.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
@@ -31,5 +54,6 @@
     "jsonwebtoken": "^9.0.2",
     "uuid": "^11.1.0",
     "zod": "^3.24.2"
-  }
+  },
+  "type": "module"
 }
