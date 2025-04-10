@@ -1,7 +1,12 @@
 import { loginUser, registerUser } from './services.ts';
 import { Request, Response } from 'express';
 import { LoginRequest, SignupRequest } from './types.ts';
-import { generateAccessToken, generateRefreshToken, verifyToken } from '../../utils/jwt.utils.ts';
+import {
+  generateAccessToken,
+  generateRefreshToken,
+  verifyAccessToken,
+  verifyToken,
+} from '../../utils/jwt.utils.ts';
 import { handleError, handleResponse } from '../../utils/responseHandling.utils.ts';
 
 export const register = async (req: Request<{}, {}, SignupRequest>, res: Response) => {
@@ -73,6 +78,21 @@ export const login = async (req: Request<{}, {}, LoginRequest>, res: Response) =
   }
 };
 
+export const logout = (_: Request, res: Response) => {
+  res.clearCookie('authToken', {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'none',
+  });
+  res.clearCookie('refreshToken', {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'none',
+  });
+  handleResponse(res, 200, 'User logged out successfully');
+  return;
+};
+
 export const refreshToken = (req: Request, res: Response): void => {
   const refreshToken = req.cookies.refreshToken; // Get refresh token from cookies
 
@@ -108,7 +128,7 @@ export const checkAuthentication = (req: Request, res: Response): void => {
   if (authToken) {
     try {
       // Verify the auth token
-      const decoded = verifyToken(authToken) as { id: string };
+      const decoded = verifyAccessToken(authToken) as { id: string };
       if (!decoded || !decoded.id) {
         handleResponse(res, 401, 'User is not authenticated/logged in');
         return;
