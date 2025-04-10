@@ -1,7 +1,7 @@
 -- CreateTable
 CREATE TABLE "User" (
     "id" UUID NOT NULL,
-    "name" TEXT,
+    "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
 
