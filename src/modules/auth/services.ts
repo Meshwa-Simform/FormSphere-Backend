@@ -1,20 +1,16 @@
 import bcrypt from 'bcrypt';
-import prisma from '../../configs/db.config';
+import prisma from '../../configs/db.config.ts';
 
 export const registerUser = async (name: string, email: string, password: string) => {
-  const existingUSer = await prisma.user.findUnique({
-    where: {
-      email: email,
-    },
-  });
-  if (existingUSer) {
+  const existingUser = await findUserByEmail(email);
+  if (existingUser) {
     throw new Error('Email already exists');
   }
   const hashedPassword = await bcrypt.hash(password, 10);
   const user = await prisma.user.create({
     data: {
-      name,
-      email,
+      name: name,
+      email: email,
       password: hashedPassword,
     },
   });
@@ -22,11 +18,7 @@ export const registerUser = async (name: string, email: string, password: string
 };
 
 export const loginUser = async (email: string, password: string) => {
-  const user = await prisma.user.findUnique({
-    where: {
-      email,
-    },
-  });
+  const user = await findUserByEmail(email);
   if (!user) {
     throw new Error('Incorrect Credentials');
   }
@@ -34,5 +26,14 @@ export const loginUser = async (email: string, password: string) => {
   if (!isValidPassword) {
     throw new Error('Incorrect Credentials');
   }
+  return user;
+};
+
+const findUserByEmail = async (email: string) => {
+  const user = await prisma.user.findUnique({
+    where: {
+      email,
+    },
+  });
   return user;
 };

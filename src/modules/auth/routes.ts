@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { checkAuthentication, login, refreshToken, register } from './controllers';
-import { validateRegister } from './middleware';
+import { checkAuthentication, login, refreshToken, register } from './controllers.ts';
+import { validateRegister } from './middleware.ts';
 
 const router = Router();
 

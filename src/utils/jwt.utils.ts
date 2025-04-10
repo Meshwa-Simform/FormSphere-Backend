@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { JWT_SECRET, REFRESH_TOKEN_SECRET } from '../configs/env.config';
+import { JWT_SECRET, REFRESH_TOKEN_SECRET } from '../configs/env.config.ts';
 
 export const generateAccessToken = (payload: object): string => {
   return jwt.sign(payload, JWT_SECRET, { expiresIn: '15m' });
