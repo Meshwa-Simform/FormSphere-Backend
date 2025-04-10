@@ -1,8 +1,8 @@
 import express from 'express';
-import authRoutes from './modules/auth/routes';
-import { CLIENT_URL, PORT } from './configs/env.config';
+import authRoutes from './modules/auth/routes.ts';
+import { CLIENT_URL, PORT } from './configs/env.config.ts';
 import cors from 'cors';
-import prisma from './configs/db.config';
+import prisma from './configs/db.config.ts';
 import cookieParser from 'cookie-parser';
 
 const app = express();

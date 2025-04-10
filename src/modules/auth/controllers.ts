@@ -1,8 +1,8 @@
-import { loginUser, registerUser } from './services';
+import { loginUser, registerUser } from './services.ts';
 import { Request, Response } from 'express';
-import { LoginRequest, SignupRequest } from './types';
-import { generateAccessToken, generateRefreshToken, verifyToken } from '../../utils/jwt.utils';
-import { handleError, handleResponse } from '../../utils/responseHandling.utils';
+import { LoginRequest, SignupRequest } from './types.ts';
+import { generateAccessToken, generateRefreshToken, verifyToken } from '../../utils/jwt.utils.ts';
+import { handleError, handleResponse } from '../../utils/responseHandling.utils.ts';
 
 export const register = async (req: Request<{}, {}, SignupRequest>, res: Response) => {
   try {

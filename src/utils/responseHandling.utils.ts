@@ -1,6 +1,6 @@
 import { Response } from 'express';
 import { ZodIssue } from 'zod';
-import { User } from '../modules/auth/types';
+import { User } from '../modules/auth/types.ts';
 
 export const handleResponse = (
   res: Response,

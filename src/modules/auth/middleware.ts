@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { registerSchema } from './validations';
-import { handleError, handleResponse } from '../../utils/responseHandling.utils';
+import { registerSchema } from './validations.ts';
+import { handleError, handleResponse } from '../../utils/responseHandling.utils.ts';
 import { ZodIssue } from 'zod';
 
 export const validateRegister = (req: Request, res: Response, next: NextFunction) => {
