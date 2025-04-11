@@ -17,3 +17,12 @@ export const verifyToken = (token: string) => {
     return null;
   }
 };
+
+export const verifyAccessToken = (token: string) => {
+  try {
+    return jwt.verify(token, JWT_SECRET);
+  } catch (error) {
+    console.error('Token verification failed:', error);
+    return null;
+  }
+};

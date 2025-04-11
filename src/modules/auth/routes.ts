@@ -1,11 +1,12 @@
 import { Router } from 'express';
-import { checkAuthentication, login, refreshToken, register } from './controllers.ts';
+import { checkAuthentication, login, logout, refreshToken, register } from './controllers.ts';
 import { validateRegister } from './middleware.ts';
 
 const router = Router();
 
 router.post('/signup', validateRegister, register);
 router.post('/login', login);
+router.post('/logout', logout);
 router.post('/refreshtoken', refreshToken);
 router.get('/authenticate', checkAuthentication);
 
