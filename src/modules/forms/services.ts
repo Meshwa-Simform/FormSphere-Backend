@@ -1,5 +1,5 @@
 import prisma from '../../configs/db.config.ts';
-import { ConditionalLogic, Form } from './types.ts';
+import { ConditionalLogic, Form, Question } from './types.ts';
 
 export const findFormById = async (formID: string) => {
   const form = await prisma.form.findUnique({
@@ -117,4 +117,117 @@ export const generateForm = async (formData: Form, userId: string) => {
       conditionalLogic: createdLogic.filter((cl) => cl.questionId === q.id),
     })),
   };
+};
+
+export const updateFormbyId = async (formId: string, formData: Form, userId: string) => {
+  const { questions, styling, ...formDetails } = formData;
+
+  if (!formDetails.title || !questions || questions.length === 0) {
+    throw new Error('Form title and questions are required');
+  }
+
+  // Delete existing questions and conditional logic
+  await prisma.conditionalLogic.deleteMany({ where: { formId } });
+  await prisma.question.deleteMany({ where: { formId } });
+
+  // Update basic form info
+  const updatedForm = await prisma.form.update({
+    where: { id: formId, userId },
+    data: {
+      title: formDetails.title,
+      description: formDetails.description,
+      logoUrl: formDetails.logoUrl || null,
+      isSinglePage: formDetails.isSinglePage,
+      noOfPages: formDetails.noOfPages,
+      privateSharingToken: formDetails.privateSharingToken || null,
+      styling: styling
+        ? {
+            update: {
+              PageColor: styling.PageColor,
+              PageImage: styling.PageImage || null,
+              formColor: styling.formColor,
+              fontColor: styling.fontColor,
+              fontFamily: styling.fontFamily,
+              fontSize: styling.fontSize,
+            },
+          }
+        : undefined,
+      questions: {
+        create: questions.map((q: Question) => ({
+          pageNumber: q.pageNumber,
+          questionType: q.questionType,
+          questionText: q.questionText,
+          questionOptions: q.questionOptions,
+          validations: q.validations,
+          questionOrder: q.questionOrder,
+          isRequired: q.isRequired ?? false,
+          isHidden: q.isHidden ?? false,
+        })),
+      },
+    },
+    include: {
+      questions: true,
+    },
+  });
+  // Create Conditional Logic using real UUIDs
+  const createdLogic: ConditionalLogic[] = [];
+  for (let i = 0; i < questions.length; i++) {
+    const question = questions[i];
+    const updatedQuestions = updatedForm.questions[i];
+
+    if (
+      question.conditionalLogic &&
+      Array.isArray(question.conditionalLogic) &&
+      question.conditionalLogic.length > 0
+    ) {
+      for (const cl of question.conditionalLogic) {
+        cl.action_questionId = cl.action_questionId
+          .map((id: string) => {
+            const actionQuestion = updatedForm.questions.find(
+              (q) => q.questionOrder.toString() === id,
+            );
+            if (actionQuestion) {
+              return actionQuestion.id;
+            }
+            return '';
+          })
+          .filter((id: string) => id !== ''); // Filter out empty strings
+        const logic = await prisma.conditionalLogic.create({
+          data: {
+            formId: updatedForm.id,
+            questionId: updatedQuestions.id,
+            condition_check: cl.condition_check,
+            action_questionId: cl.action_questionId,
+          },
+        });
+        createdLogic.push(logic);
+      }
+    }
+  }
+
+  // Return full form with questions and logic
+  return {
+    ...updatedForm,
+    questions: updatedForm.questions.map((q) => ({
+      ...q,
+      conditionalLogic: createdLogic.filter((cl) => cl.questionId === q.id),
+    })),
+  };
+};
+
+export const deleteFormbyId = async (formID: string, userId: string) => {
+  const existingForm = await findFormById(formID);
+  if (!existingForm) {
+    throw new Error('Form not found');
+  }
+  if (existingForm.userId !== userId) {
+    throw new Error('Unauthorized');
+  }
+  const form = await prisma.form.delete({
+    where: {
+      id: formID,
+      userId: userId,
+    },
+  });
+  return form;
 };

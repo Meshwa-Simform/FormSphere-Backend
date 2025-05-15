@@ -1,5 +1,11 @@
 import { Request, Response } from 'express';
-import { findFormById, findForms, generateForm } from './services.ts';
+import {
+  deleteFormbyId,
+  findFormById,
+  findForms,
+  generateForm,
+  updateFormbyId,
+} from './services.ts';
 import { verifyToken } from '../../utils/jwt.utils.ts';
 import { handleFormResponse } from '../../utils/responseHandling.utils.ts';
 import { FormOutput } from './types.ts';
@@ -59,6 +65,47 @@ export const createForm = async (req: Request, res: Response) => {
     console.error('Error creating form:', error);
     handleFormResponse(res, 500, 'Failed to create form');
   }
+};
+
+export const updateForm = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const userID = await getUserId(req, res);
+  if (!userID) {
+    return;
+  }
+  const formData = req.body;
+  if (!formData) {
+    handleFormResponse(res, 400, 'Form data is required');
+    return;
+  }
+  const form = await updateFormbyId(id, formData, userID);
+  if (!form) {
+    handleFormResponse(res, 400, 'Form update failed');
+    return;
+  }
+  const transformedForm = {
+    ...form,
+    questions: form.questions.map((question: any) => ({
+      ...question,
+      ConditionalLogic: question.conditionalLogic,
+      isHidden: question.isHidden || false,
+    })),
+  };
+  handleFormResponse(res, 200, 'Form updated successfully', transformedForm as FormOutput);
+};
+
+export const deleteForm = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const userID = await getUserId(req, res);
+  if (!userID) {
+    return;
+  }
+  const deletedForm = await deleteFormbyId(id, userID);
+  if (!deletedForm) {
+    handleFormResponse(res, 400, 'Form deletion failed');
+    return;
+  }
+  handleFormResponse(res, 200, 'Form deleted successfully', deletedForm as FormOutput);
 };
 
 const getUserId = async (req: Request, res: Response) => {
