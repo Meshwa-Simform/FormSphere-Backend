@@ -1,9 +1,7 @@
 {
   "root": true,
   "parser": "@typescript-eslint/parser",
-  "plugins": [
-    "@typescript-eslint"
-  ],
+  "plugins": ["@typescript-eslint"],
   "extends": [
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
@@ -17,14 +15,8 @@
     "es2020": true
   },
   "rules": {
-    "semi": [
-      "error",
-      "always"
-    ],
-    "quotes": [
-      "error",
-      "single"
-    ],
+    "semi": ["error", "always"],
+    "quotes": ["error", "single"],
     "prettier/prettier": "warn",
     "@typescript-eslint/no-unused-vars": [
       "warn",
@@ -36,25 +28,10 @@
     "import/order": [
       "warn",
       {
-        "groups": [
-          [
-            "builtin",
-            "external"
-          ],
-          "internal",
-          [
-            "parent",
-            "sibling",
-            "index"
-          ]
-        ],
-        "newlines-between": "always",
-      },
-    ],
+        "groups": [["builtin", "external"], "internal", ["parent", "sibling", "index"]],
+        "newlines-between": "always"
+      }
+    ]
   },
-  "ignorePatterns": [
-    "dist",
-    "node_modules",
-    "*.js"
-  ]
+  "ignorePatterns": ["dist", "node_modules", "*.js"]
 }
