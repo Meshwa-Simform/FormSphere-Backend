@@ -19,21 +19,20 @@ model User {
   email    String @unique
   password String
 
-  Form     Form[]
-  Response Response[]
+  Form Form[]
 }
 
 model Form {
   id                  String     @id @default(uuid()) @db.Uuid
   userId              String     @db.Uuid
-  user                User       @relation(fields: [userId], references: [id])
+  user                User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   title               String
   description         String
   logoUrl             String?
   isSinglePage        Boolean    @default(true)
-  noOfPages           Int
+  noOfPages           Int        @default(1)
   questions           Question[]
-  styling             Styling?
+  styling             Json?
   privateSharingToken String?
   createdAt           DateTime   @default(now())
   updatedAt           DateTime   @updatedAt
@@ -48,10 +47,9 @@ model Templates {
   description         String
   logoUrl             String?
   isSinglePage        Boolean    @default(true)
-  noOfPages           Int
+  noOfPages           Int        @default(1)
   questions           Question[]
-  stylingId           String?    @db.Uuid
-  styling             Styling?   @relation(fields: [stylingId], references: [id])
+  styling             Json
   privateSharingToken String?
   createdAt           DateTime   @default(now())
   updatedAt           DateTime   @updatedAt
@@ -60,10 +58,11 @@ model Templates {
 model Question {
   id              String     @id @default(uuid()) @db.Uuid
   formId          String?    @db.Uuid
-  form            Form?      @relation(fields: [formId], references: [id])
+  form            Form?      @relation(fields: [formId], references: [id], onDelete: Cascade)
   templateId      String?    @db.Uuid
-  template        Templates? @relation(fields: [templateId], references: [id])
+  template        Templates? @relation(fields: [templateId], references: [id], onDelete: Cascade)
   pageNumber      Int
+  questionType    String
   questionText    String
   questionOptions String[]
   validations     String[]
@@ -73,43 +72,38 @@ model Question {
   isHidden        Boolean    @default(false)
 
   ConditionalLogic ConditionalLogic[]
-  Response         Response[]
-}
-
-model Styling {
-  id         String  @id @default(uuid()) @db.Uuid
-  formId     String  @unique @db.Uuid
-  form       Form    @relation(fields: [formId], references: [id])
-  PageColor  String
-  PageImage  String?
-  formColor  String
-  fontColor  String
-  fontFamily String
-  fontSize   Int
-
-  Templates Templates[]
 }
 
 model ConditionalLogic {
   id                String   @id @default(uuid()) @db.Uuid
   formId            String   @db.Uuid
-  form              Form     @relation(fields: [formId], references: [id])
+  form              Form     @relation(fields: [formId], references: [id], onDelete: Cascade)
   questionId        String   @db.Uuid
-  question          Question @relation(fields: [questionId], references: [id])
+  question          Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
   condition_check   String
   action_questionId String[]
 }
 
 model Response {
-  id             String   @id @default(uuid()) @db.Uuid
-  userId         String   @db.Uuid
-  user           User     @relation(fields: [userId], references: [id])
-  userName       String
-  userEmail      String
-  formId         String   @db.Uuid
-  form           Form     @relation(fields: [formId], references: [id])
-  questionId     String   @db.Uuid
-  question       Question @relation(fields: [questionId], references: [id])
-  responseAnswer String
-  createdAt      DateTime @default(now())
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  userName  String
+  userEmail String
+  formId    String   @db.Uuid
+  form      Form     @relation(fields: [formId], references: [id], onDelete: Cascade)
+  answers   Answer[] @relation("ResponseToAnswer")
+  createdAt DateTime @default(now())
+}
+
+model Answer {
+  id              String   @id @default(uuid()) @db.Uuid
+  responseId      String   @db.Uuid
+  response        Response @relation("ResponseToAnswer", fields: [responseId], references: [id], onDelete: Cascade)
+  questionId      String   @db.Uuid
+  questionType    String
+  questionText    String
+  questionOptions String[]
+  questionAnswer  String?
+  questionOrder   Int
+  responseAnswer  String
 }
