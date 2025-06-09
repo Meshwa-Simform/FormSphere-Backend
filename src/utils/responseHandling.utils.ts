@@ -3,6 +3,7 @@ import { ZodIssue } from 'zod';
 import { User } from '../modules/auth/types.ts';
 import { FormOutput } from '../modules/forms/types.ts';
 import { Responses } from '../modules/response/types.ts';
+import { TemplateOutput } from '../modules/templates/types.ts';
 
 export const handleResponse = (
   res: Response,
@@ -29,4 +30,13 @@ export const handleFormResponse = (
   form?: FormOutput | FormOutput[] | Responses | Responses[],
 ): void => {
   res.status(statusCode).json({ message, form });
+};
+
+export const handleTemplateResponse = (
+  res: Response,
+  statusCode: number,
+  message: string,
+  template?: TemplateOutput | TemplateOutput[],
+): void => {
+  res.status(statusCode).json({ message, template });
 };
