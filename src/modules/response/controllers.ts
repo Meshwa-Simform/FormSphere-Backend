@@ -1,7 +1,12 @@
 import { Request, Response } from 'express';
 import { handleFormResponse } from '../../utils/responseHandling.utils.ts';
 import { verifyToken } from '../../utils/jwt.utils.ts';
-import { createResponseService, getFormById, getResponsesService } from './services.ts';
+import {
+  createResponseService,
+  getFormById,
+  getResponsesService,
+  uploadFileService,
+} from './services.ts';
 import { Responses } from './types.ts';
 
 export const createResponse = async (req: Request, res: Response) => {
@@ -74,3 +79,23 @@ const getUserId = async (req: Request, res: Response) => {
   }
   return decoded.id;
 };
+
+export const uploadFile = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const file = req.file;
+
+    if (!file) {
+      res.status(400).json({ message: 'No file uploaded' });
+      return;
+    }
+
+    // Call the service to upload the file to Cloudinary
+    const fileUrl = await uploadFileService(file);
+
+    res.status(200).json({ url: fileUrl });
+  } catch (error) {
+    console.error('Error uploading file:', error);
+    res.status(500).json({ message: 'Failed to upload file' });
+  }
+};
+

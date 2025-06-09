@@ -1,4 +1,5 @@
 import prisma from '../../configs/db.config.ts';
+import cloudinary from '../../configs/cloudinary.config.ts';
 
 export const createResponseService = async (formData: any, userID: string) => {
   const { answers, formId } = formData;
@@ -54,6 +55,35 @@ export const getResponsesService = async (formId: string) => {
   });
 
   return responses;
+};
+
+export const uploadFileService = async (file: Express.Multer.File): Promise<string> => {
+  try {
+    if (!file || !file.buffer) {
+      throw new Error('Invalid file data');
+    }
+
+    // Upload the file to Cloudinary
+    const uploadResult = await new Promise<string>((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        { resource_type: 'auto' }, // Automatically detect file type (image, video, etc.)
+        (error, result) => {
+          if (error) {
+            reject(new Error(`Cloudinary upload error: ${error.message}`));
+          } else {
+            resolve(result?.secure_url || '');
+          }
+        },
+      );
+      uploadStream.end(file.buffer);
+    });
+
+    console.log(`File uploaded successfully: ${uploadResult}`);
+    return uploadResult;
+  } catch (error) {
+    console.error('Error uploading file to Cloudinary:', error);
+    throw new Error('Failed to upload file');
+  }
 };
 
 export const getFormById = async (formId: string) => {
