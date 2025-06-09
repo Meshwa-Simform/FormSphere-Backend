@@ -2,6 +2,7 @@ import express from 'express';
 import authRoutes from './modules/auth/routes.ts';
 import formRoutes from './modules/forms/routes.ts';
 import responseRoutes from './modules/response/routes.ts';
+import templatesRoute from './modules/templates/routes.ts';
 import { CLIENT_URL, PORT } from './configs/env.config.ts';
 import cors from 'cors';
 import prisma from './configs/db.config.ts';
@@ -24,6 +25,7 @@ app.use(cookieParser());
 app.use('/auth', authRoutes);
 app.use('/forms', formRoutes);
 app.use('/responses', responseRoutes);
+app.use('/templates', templatesRoute);
 
 // Start the server
 const SERVER_PORT = PORT;
