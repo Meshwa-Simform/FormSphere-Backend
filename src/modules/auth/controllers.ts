@@ -17,23 +17,8 @@ export const register = async (req: Request<{}, {}, SignupRequest>, res: Respons
       handleResponse(res, 400, 'User registration failed');
       return;
     }
-    // Generate Access Token
-    const token = generateAccessToken({ id: user.id });
-    res.cookie('authToken', token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'none',
-      maxAge: 15 * 60 * 1000, // 15 minutes
-    });
-
-    // Generate Refresh Token
-    const refreshToken = generateRefreshToken({ id: user.id });
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'none',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    });
+    // Generate Accessand refresh Token
+    generateTokens(user.id, res);
 
     handleResponse(res, 200, 'User registered successfully', user);
   } catch (error) {
@@ -54,23 +39,8 @@ export const login = async (req: Request<{}, {}, LoginRequest>, res: Response) =
       handleResponse(res, 400, 'User login failed');
       return;
     }
-    // Generate Access Token
-    const token = generateAccessToken({ id: user.id });
-    res.cookie('authToken', token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'none',
-      maxAge: 15 * 60 * 1000, // 15 minutes
-    });
-
-    // Generate Refresh Token
-    const refreshToken = generateRefreshToken({ id: user.id });
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'none',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    });
+    // Generate Accessand refresh Token
+    generateTokens(user.id, res);
 
     handleResponse(res, 200, 'User registered successfully', user);
   } catch (error) {
@@ -159,3 +129,24 @@ export const checkAuthentication = (req: Request, res: Response): void => {
     handleError(res, 401, 'User is not authenticated/logged in', error as Error);
   }
 };
+
+// helper function for token generation
+function generateTokens(userId: string, res: Response) {
+  // Generate Access Token
+  const token = generateAccessToken({ id: userId });
+  res.cookie('authToken', token, {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'none',
+    maxAge: 15 * 60 * 1000, // 15 minutes
+  });
+
+  // Generate Refresh Token
+  const refreshToken = generateRefreshToken({ id: userId });
+  res.cookie('refreshToken', refreshToken, {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'none',
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+  });
+}
