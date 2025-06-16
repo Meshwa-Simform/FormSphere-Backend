@@ -9,13 +9,16 @@ export const registerUser = async (name: string, email: string, password: string
   const hashedPassword = await bcrypt.hash(password, 10);
   const user = await prisma.user.create({
     data: {
-
       name: name,
       email: email,
       password: hashedPassword,
     },
   });
-  return user;
+  return {
+    id: user?.id,
+    name: user?.name,
+    email: user?.email,
+  };
 };
 
 export const loginUser = async (email: string, password: string) => {
@@ -27,7 +30,11 @@ export const loginUser = async (email: string, password: string) => {
   if (!isValidPassword) {
     throw new Error('Incorrect Credentials');
   }
-  return user;
+  return {
+    id: user?.id,
+    name: user?.name,
+    email: user?.email,
+  };
 };
 
 const findUserByEmail = async (email: string) => {

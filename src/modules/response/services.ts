@@ -1,7 +1,8 @@
 import prisma from '../../configs/db.config.ts';
 import cloudinary from '../../configs/cloudinary.config.ts';
+import { InputAnswer, inputResponse } from './types.ts';
 
-export const createResponseService = async (formData: any, userID: string) => {
+export const createResponseService = async (formData: inputResponse, userID: string) => {
   const { answers, formId } = formData;
 
   if (!formId || !answers || answers.length === 0) {
@@ -25,7 +26,7 @@ export const createResponseService = async (formData: any, userID: string) => {
       userEmail: user.email,
       form: { connect: { id: formId } },
       answers: {
-        create: answers.map((a: any) => ({
+        create: answers.map((a: InputAnswer) => ({
           questionId: a.questionId,
           questionText: a.questionText,
           questionType: a.questionType,

@@ -19,3 +19,18 @@ export interface Answer {
   questionOrder: number;
   responseAnswer: string;
 }
+
+export interface inputResponse {
+  formId: string;
+  answers: InputAnswer[];
+}
+
+export interface InputAnswer {
+  questionId: string;
+  questionText: string;
+  questionType: string;
+  questionOptions?: string[];
+  questionAnswer?: string;
+  questionOrder: number;
+  responseAnswer: string;
+}

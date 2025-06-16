@@ -1,42 +1,20 @@
 import { Response } from 'express';
 import { ZodIssue } from 'zod';
-import { User } from '../modules/auth/types.ts';
-import { FormOutput } from '../modules/forms/types.ts';
-import { Responses } from '../modules/response/types.ts';
-import { TemplateOutput } from '../modules/templates/types.ts';
 
-export const handleResponse = (
+export function handleResponse<T>(
   res: Response,
   statusCode: number,
   message: string,
-  user?: User,
-): void => {
-  res.status(statusCode).json({ message, user });
-};
+  data?: T,
+): void {
+  res.status(statusCode).json({ message, data });
+}
 
-export const handleError = (
+export function handleError(
   res: Response,
   statusCode: number,
   message: string,
   error: Error | ZodIssue[],
-): void => {
+): void {
   res.status(statusCode).json({ message, error });
-};
-
-export const handleFormResponse = (
-  res: Response,
-  statusCode: number,
-  message: string,
-  form?: FormOutput | FormOutput[] | Responses | Responses[],
-): void => {
-  res.status(statusCode).json({ message, form });
-};
-
-export const handleTemplateResponse = (
-  res: Response,
-  statusCode: number,
-  message: string,
-  template?: TemplateOutput | TemplateOutput[],
-): void => {
-  res.status(statusCode).json({ message, template });
-};
+}
