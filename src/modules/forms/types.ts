@@ -1,0 +1,91 @@
+export interface Form {
+  id?: string;
+  userId?: string;
+  title: string;
+  description: string;
+  logoUrl?: string;
+  isSinglePage: boolean;
+  noOfPages: number;
+  questions: Question[];
+  styling?: Styling;
+  privateSharingToken?: string;
+  conditionalLogic?: ConditionalLogic;
+  createdAt: Date;
+  updatedAt: Date;
+  ConditionalLogic: string[];
+}
+
+export interface FormOutput {
+  questions: Array<{
+    ConditionalLogic: Array<{
+      id: string;
+      formId: string;
+      questionId: string;
+      condition_check: string;
+      action_questionId: string[];
+    }>;
+    id: string;
+    formId: string | null;
+    templateId: string | null;
+    validations: string[];
+    pageNumber: number;
+    questionType: string;
+    questionText: string;
+    questionOptions: string[];
+    questionAnswer: string | null;
+    questionOrder: number;
+    isRequired: boolean;
+    isHidden: boolean;
+  }>;
+  id: string;
+  userId: string | null;
+  title: string;
+  description: string;
+  logoUrl: string | null;
+  isSinglePage: boolean;
+  noOfPages: number;
+  styling: {
+    PageColor: string;
+    PageImage: string | null;
+    formColor: string;
+    fontColor: string;
+    fontFamily: string;
+    fontSize: number;
+  } | null;
+  privateSharingToken: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface Styling {
+  PageColor: string;
+  PageImage?: string;
+  formColor: string;
+  fontColor: string;
+  fontFamily: string;
+  fontSize: number;
+}
+
+export interface Question {
+  id?: string;
+  formId?: string;
+  templateId?: string;
+  validations: string[];
+  pageNumber: number;
+  questionType: string;
+  questionText: string;
+  questionOptions: string[];
+  questionAnswer?: string;
+  questionOrder: number;
+  isRequired: boolean;
+  isHidden: boolean;
+  conditionalLogic?: ConditionalLogic[];
+}
+
+export interface ConditionalLogic {
+  id?: string;
+  formId?: string;
+  questionId?: string;
+  condition_check: string;
+  action_questionId: string[];
+}
