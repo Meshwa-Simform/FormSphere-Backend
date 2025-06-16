@@ -2,11 +2,22 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-if(!process.env.DATABASE_URL) {
-    throw new Error("DATABASE_URL is not defined");
+if (!process.env.DATABASE_URL) {
+  throw new Error('DATABASE_URL is not defined');
+}
+if (
+  !process.env.CLOUDINARY_CLOUD_NAME ||
+  !process.env.CLOUDINARY_API_KEY ||
+  !process.env.CLOUDINARY_API_SECRET
+) {
+  throw new Error('CLOUDINARY is not defined');
 }
 export const PORT = process.env.PORT || 3000;
 export const DATABASE_URL = process.env.DATABASE_URL;
-export const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret";
-export const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET || "your_refresh_token_secret";
-export const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:4200";
+export const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
+export const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET || 'your_refresh_token_secret';
+export const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:4200';
+
+export const CLOUDINARY_CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME;
+export const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY;
+export const CLOUDINARY_API_SECRET = process.env.CLOUDINARY_API_SECRET;
