@@ -9,8 +9,8 @@ export const createTemplateService = async (templateData: Template) => {
       title: templateDetails.title,
       description: templateDetails.description,
       styling: {
-        PageColor: styling?.PageColor ?? null,
-        PageImage: styling?.PageImage ?? null,
+        pageColor: styling?.pageColor ?? null,
+        pageImage: styling?.pageImage ?? null,
         formColor: styling?.formColor ?? null,
         fontColor: styling?.fontColor ?? null,
         fontFamily: styling?.fontFamily ?? null,

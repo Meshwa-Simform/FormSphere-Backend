@@ -23,8 +23,8 @@ export interface TemplateQuestion {
 }
 
 export interface Styling {
-  PageColor: string;
-  PageImage?: string;
+  pageColor: string;
+  pageImage?: string;
   formColor: string;
   fontColor: string;
   fontFamily: string;

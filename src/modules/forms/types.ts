@@ -45,8 +45,8 @@ export interface FormOutput {
   isSinglePage: boolean;
   noOfPages: number;
   styling: {
-    PageColor: string;
-    PageImage: string | null;
+    pageColor: string;
+    pageImage: string | null;
     formColor: string;
     fontColor: string;
     fontFamily: string;
@@ -58,8 +58,8 @@ export interface FormOutput {
 }
 
 export interface Styling {
-  PageColor: string;
-  PageImage?: string;
+  pageColor: string;
+  pageImage?: string;
   formColor: string;
   fontColor: string;
   fontFamily: string;

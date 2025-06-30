@@ -48,14 +48,12 @@ export const generateForm = async (formData: Form, userId: string) => {
         privateSharingToken: formDetails.privateSharingToken || null,
         styling: styling
           ? {
-              create: {
-                PageColor: styling.PageColor,
-                PageImage: styling.PageImage || null,
-                formColor: styling.formColor,
-                fontColor: styling.fontColor,
-                fontFamily: styling.fontFamily,
-                fontSize: styling.fontSize,
-              },
+              pageColor: styling.pageColor,
+              pageImage: styling.pageImage || null,
+              formColor: styling.formColor,
+              fontColor: styling.fontColor,
+              fontFamily: styling.fontFamily,
+              fontSize: styling.fontSize,
             }
           : undefined,
         questions: {
@@ -136,14 +134,12 @@ export const updateFormbyId = async (formId: string, formData: Form, userId: str
         privateSharingToken: formDetails.privateSharingToken || null,
         styling: styling
           ? {
-              update: {
-                PageColor: styling.PageColor,
-                PageImage: styling.PageImage || null,
-                formColor: styling.formColor,
-                fontColor: styling.fontColor,
-                fontFamily: styling.fontFamily,
-                fontSize: styling.fontSize,
-              },
+              pageColor: styling.pageColor,
+              pageImage: styling.pageImage || null,
+              formColor: styling.formColor,
+              fontColor: styling.fontColor,
+              fontFamily: styling.fontFamily,
+              fontSize: styling.fontSize,
             }
           : undefined,
         questions: {
@@ -202,6 +198,29 @@ export const deleteFormbyId = async (formID: string, userId: string) => {
     },
   });
   return form;
+};
+
+export const getFormsService = async (
+  userId: string,
+  search: string,
+  page: number,
+  pageSize: number,
+) => {
+  const skip = (page - 1) * pageSize;
+  const where: any = { userId };
+  if (search) {
+    where.title = { contains: search, mode: 'insensitive' };
+  }
+  const [forms, total] = await Promise.all([
+    prisma.form.findMany({
+      where,
+      skip,
+      take: pageSize,
+      orderBy: { createdAt: 'desc' },
+    }),
+    prisma.form.count({ where }),
+  ]);
+  return { forms, total };
 };
 
 // Helper function for creating conditional logic for questions
