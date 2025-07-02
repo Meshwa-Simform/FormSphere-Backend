@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 export interface Form {
   id?: string;
   userId?: string;
@@ -21,13 +22,14 @@ export interface FormOutput {
       id: string;
       formId: string;
       questionId: string;
-      condition_check: string;
+      operator: string;
+      value: string;
       action_questionId: string[];
     }>;
     id: string;
     formId: string | null;
     templateId: string | null;
-    validations: string[];
+    validations: Prisma.JsonValue;
     pageNumber: number;
     questionType: string;
     questionText: string;
@@ -36,6 +38,8 @@ export interface FormOutput {
     questionOrder: number;
     isRequired: boolean;
     isHidden: boolean;
+    action: string | null; // e.g., "show", "hide"
+    condition: string | null;
   }>;
   id: string;
   userId: string | null;
@@ -45,8 +49,8 @@ export interface FormOutput {
   isSinglePage: boolean;
   noOfPages: number;
   styling: {
-    PageColor: string;
-    PageImage: string | null;
+    pageColor: string;
+    pageImage: string | null;
     formColor: string;
     fontColor: string;
     fontFamily: string;
@@ -58,8 +62,8 @@ export interface FormOutput {
 }
 
 export interface Styling {
-  PageColor: string;
-  PageImage?: string;
+  pageColor: string;
+  pageImage?: string;
   formColor: string;
   fontColor: string;
   fontFamily: string;
@@ -70,7 +74,7 @@ export interface Question {
   id?: string;
   formId?: string;
   templateId?: string;
-  validations: string[];
+  validations: Prisma.JsonValue;
   pageNumber: number;
   questionType: string;
   questionText: string;
@@ -79,6 +83,8 @@ export interface Question {
   questionOrder: number;
   isRequired: boolean;
   isHidden: boolean;
+  action: string | null; // e.g., "show", "hide"
+  condition: string | null;
   conditionalLogic?: ConditionalLogic[];
 }
 
@@ -86,6 +92,7 @@ export interface ConditionalLogic {
   id?: string;
   formId?: string;
   questionId?: string;
-  condition_check: string;
+  operator: string;
+  value: string;
   action_questionId: string[];
 }

@@ -1,4 +1,4 @@
-import { JsonValue } from '@prisma/client/runtime/library';
+import { Prisma } from '@prisma/client';
 
 export interface Template {
   id: string;
@@ -16,15 +16,15 @@ export interface TemplateQuestion {
   questionText: string;
   questionType: string;
   questionOptions: string[];
-  validations: string[];
+  validations: Prisma.JsonValue;
   questionOrder: number;
   pageNumber: number;
   isRequired: boolean;
 }
 
 export interface Styling {
-  PageColor: string;
-  PageImage?: string;
+  pageColor: string;
+  pageImage?: string;
   formColor: string;
   fontColor: string;
   fontFamily: string;
@@ -38,7 +38,7 @@ export interface TemplateOutput {
   logoUrl: string | null;
   isSinglePage: boolean;
   noOfPages: number;
-  styling: JsonValue | null;
+  styling: Prisma.JsonValue | null;
   privateSharingToken: string | null;
   createdAt: Date;
   updatedAt: Date;
@@ -50,7 +50,7 @@ export interface TemplateOutput {
     questionType: string;
     questionText: string;
     questionOptions: string[];
-    validations: string[];
+    validations: Prisma.JsonValue;
     questionAnswer: string | null;
     questionOrder: number;
     isRequired: boolean;

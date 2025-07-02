@@ -65,12 +65,14 @@ model Question {
   questionType    String
   questionText    String
   questionOptions String[]
-  validations     String[]
+  validations     Json       @default("{}")
   questionAnswer  String?
   questionOrder   Int
   isRequired      Boolean    @default(false)
   isHidden        Boolean    @default(false)
 
+  condition       String?    // "AND" or "OR"
+  action          String?     // e.g., "show", "hide"
   ConditionalLogic ConditionalLogic[]
 }
 
@@ -80,7 +82,8 @@ model ConditionalLogic {
   form              Form     @relation(fields: [formId], references: [id], onDelete: Cascade)
   questionId        String   @db.Uuid
   question          Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
-  condition_check   String
+  operator          String // e.g., "equals", "not_equals", "contains", etc.
+  value             String // e.g., "Yes"
   action_questionId String[]
 }
 

@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import { createForm, deleteForm, getAllForms, getFormById, updateForm } from './controllers.ts';
+import { createForm, deleteForm, getFormById, updateForm, getForms } from './controllers.ts';
 
 const router = Router();
 
-router.get('/', getAllForms);
+router.get('/', getForms);
 router.get('/:id', getFormById);
 router.post('/create', createForm);
 router.put('/:id', updateForm);

@@ -48,14 +48,12 @@ export const generateForm = async (formData: Form, userId: string) => {
         privateSharingToken: formDetails.privateSharingToken || null,
         styling: styling
           ? {
-              create: {
-                PageColor: styling.PageColor,
-                PageImage: styling.PageImage || null,
-                formColor: styling.formColor,
-                fontColor: styling.fontColor,
-                fontFamily: styling.fontFamily,
-                fontSize: styling.fontSize,
-              },
+              pageColor: styling.pageColor,
+              pageImage: styling.pageImage || null,
+              formColor: styling.formColor,
+              fontColor: styling.fontColor,
+              fontFamily: styling.fontFamily,
+              fontSize: styling.fontSize,
             }
           : undefined,
         questions: {
@@ -64,10 +62,12 @@ export const generateForm = async (formData: Form, userId: string) => {
             questionType: q.questionType,
             questionText: q.questionText,
             questionOptions: q.questionOptions,
-            validations: q.validations,
+            validations: q.validations === null || q.validations === undefined ? {} : q.validations,
             questionOrder: q.questionOrder,
             isRequired: q.isRequired ?? false,
             isHidden: q.isHidden ?? false,
+            action: q.action || null, // e.g., "show", "hide"
+            condition: q.condition || null, // e.g., "Yes"
           })),
         },
       },
@@ -85,6 +85,7 @@ export const generateForm = async (formData: Form, userId: string) => {
         formId: q.formId === null ? undefined : q.formId,
         templateId: q.templateId === null ? undefined : q.templateId,
         questionAnswer: q.questionAnswer === null ? undefined : q.questionAnswer,
+        validations: typeof q.validations === 'object' ? q.validations : {},
       })),
       prisma,
     );
@@ -136,14 +137,12 @@ export const updateFormbyId = async (formId: string, formData: Form, userId: str
         privateSharingToken: formDetails.privateSharingToken || null,
         styling: styling
           ? {
-              update: {
-                PageColor: styling.PageColor,
-                PageImage: styling.PageImage || null,
-                formColor: styling.formColor,
-                fontColor: styling.fontColor,
-                fontFamily: styling.fontFamily,
-                fontSize: styling.fontSize,
-              },
+              pageColor: styling.pageColor,
+              pageImage: styling.pageImage || null,
+              formColor: styling.formColor,
+              fontColor: styling.fontColor,
+              fontFamily: styling.fontFamily,
+              fontSize: styling.fontSize,
             }
           : undefined,
         questions: {
@@ -152,10 +151,15 @@ export const updateFormbyId = async (formId: string, formData: Form, userId: str
             questionType: q.questionType,
             questionText: q.questionText,
             questionOptions: q.questionOptions,
-            validations: q.validations,
+            validations:
+              q.validations === null || q.validations === undefined
+                ? Prisma.JsonNull
+                : q.validations,
             questionOrder: q.questionOrder,
             isRequired: q.isRequired ?? false,
             isHidden: q.isHidden ?? false,
+            action: q.action || null, // e.g., "show", "hide"
+            condition: q.condition || null, // e.g., "Yes"
           })),
         },
       },
@@ -172,6 +176,7 @@ export const updateFormbyId = async (formId: string, formData: Form, userId: str
         formId: q.formId === null ? undefined : q.formId,
         templateId: q.templateId === null ? undefined : q.templateId,
         questionAnswer: q.questionAnswer === null ? undefined : q.questionAnswer,
+        validations: q.validations === null ? {} : q.validations,
       })),
       prisma,
     );
@@ -202,6 +207,29 @@ export const deleteFormbyId = async (formID: string, userId: string) => {
     },
   });
   return form;
+};
+
+export const getFormsService = async (
+  userId: string,
+  search: string,
+  page: number,
+  pageSize: number,
+) => {
+  const skip = (page - 1) * pageSize;
+  const where: any = { userId };
+  if (search) {
+    where.title = { contains: search, mode: 'insensitive' };
+  }
+  const [forms, total] = await Promise.all([
+    prisma.form.findMany({
+      where,
+      skip,
+      take: pageSize,
+      orderBy: { createdAt: 'desc' },
+    }),
+    prisma.form.count({ where }),
+  ]);
+  return { forms, total };
 };
 
 // Helper function for creating conditional logic for questions
@@ -238,7 +266,8 @@ async function createConditionalLogicForQuestions(
           data: {
             formId: formId,
             questionId: createdQuestion.id as string,
-            condition_check: cl.condition_check,
+            operator: cl.operator,
+            value: cl.value,
             action_questionId: cl.action_questionId,
           },
         });

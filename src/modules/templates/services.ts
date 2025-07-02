@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 import prisma from '../../configs/db.config.ts';
 import { Template } from './types.ts';
 
@@ -9,8 +10,8 @@ export const createTemplateService = async (templateData: Template) => {
       title: templateDetails.title,
       description: templateDetails.description,
       styling: {
-        PageColor: styling?.PageColor ?? null,
-        PageImage: styling?.PageImage ?? null,
+        pageColor: styling?.pageColor ?? null,
+        pageImage: styling?.pageImage ?? null,
         formColor: styling?.formColor ?? null,
         fontColor: styling?.fontColor ?? null,
         fontFamily: styling?.fontFamily ?? null,
@@ -22,7 +23,7 @@ export const createTemplateService = async (templateData: Template) => {
           questionType: q.questionType,
           questionText: q.questionText,
           questionOptions: q.questionOptions,
-          validations: q.validations,
+          validations: q.validations as Prisma.InputJsonValue,
           questionOrder: q.questionOrder,
           isRequired: q.isRequired ?? false,
         })),
