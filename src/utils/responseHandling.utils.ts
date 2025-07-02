@@ -7,6 +7,7 @@ export function handleResponse<T>(
   message: string,
   data?: T,
 ): void {
+  res.locals.message = message;
   res.status(statusCode).json({ message, data });
 }
 
@@ -16,5 +17,6 @@ export function handleError(
   message: string,
   error: Error | ZodIssue[],
 ): void {
+  res.locals.message = message;
   res.status(statusCode).json({ message, error });
 }

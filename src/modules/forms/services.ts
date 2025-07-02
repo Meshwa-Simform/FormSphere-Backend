@@ -62,10 +62,12 @@ export const generateForm = async (formData: Form, userId: string) => {
             questionType: q.questionType,
             questionText: q.questionText,
             questionOptions: q.questionOptions,
-            validations: q.validations,
+            validations: q.validations === null || q.validations === undefined ? {} : q.validations,
             questionOrder: q.questionOrder,
             isRequired: q.isRequired ?? false,
             isHidden: q.isHidden ?? false,
+            action: q.action || null, // e.g., "show", "hide"
+            condition: q.condition || null, // e.g., "Yes"
           })),
         },
       },
@@ -83,6 +85,7 @@ export const generateForm = async (formData: Form, userId: string) => {
         formId: q.formId === null ? undefined : q.formId,
         templateId: q.templateId === null ? undefined : q.templateId,
         questionAnswer: q.questionAnswer === null ? undefined : q.questionAnswer,
+        validations: typeof q.validations === 'object' ? q.validations : {},
       })),
       prisma,
     );
@@ -148,10 +151,15 @@ export const updateFormbyId = async (formId: string, formData: Form, userId: str
             questionType: q.questionType,
             questionText: q.questionText,
             questionOptions: q.questionOptions,
-            validations: q.validations,
+            validations:
+              q.validations === null || q.validations === undefined
+                ? Prisma.JsonNull
+                : q.validations,
             questionOrder: q.questionOrder,
             isRequired: q.isRequired ?? false,
             isHidden: q.isHidden ?? false,
+            action: q.action || null, // e.g., "show", "hide"
+            condition: q.condition || null, // e.g., "Yes"
           })),
         },
       },
@@ -168,6 +176,7 @@ export const updateFormbyId = async (formId: string, formData: Form, userId: str
         formId: q.formId === null ? undefined : q.formId,
         templateId: q.templateId === null ? undefined : q.templateId,
         questionAnswer: q.questionAnswer === null ? undefined : q.questionAnswer,
+        validations: q.validations === null ? {} : q.validations,
       })),
       prisma,
     );
@@ -257,7 +266,8 @@ async function createConditionalLogicForQuestions(
           data: {
             formId: formId,
             questionId: createdQuestion.id as string,
-            condition_check: cl.condition_check,
+            operator: cl.operator,
+            value: cl.value,
             action_questionId: cl.action_questionId,
           },
         });
