@@ -4,8 +4,9 @@ import { verifyToken } from '../../utils/jwt.utils.ts';
 import {
   createResponseService,
   getFormById,
-  getResponsesService,
+  getAllResponsesService,
   uploadFileService,
+  getResponsesService, // use the unified service
 } from './services.ts';
 import { Responses } from './types.ts';
 
@@ -33,7 +34,7 @@ export const createResponse = async (req: Request, res: Response) => {
   }
 };
 
-export const getResponses = async (req: Request, res: Response) => {
+export const getAllResponses = async (req: Request, res: Response) => {
   const { id } = req.params;
   const userID = await getUserId(req, res);
   if (!userID) {
@@ -53,12 +54,40 @@ export const getResponses = async (req: Request, res: Response) => {
       return;
     }
     // Call the service to get responses
-    const responses = await getResponsesService(formId);
+    const responses = await getAllResponsesService(formId);
     if (!responses || responses.length === 0) {
       handleResponse(res, 404, 'No responses found');
       return;
     }
     handleResponse(res, 200, 'Responses found', responses as Responses[]);
+  } catch (error) {
+    console.error('Error getting responses:', error);
+    handleResponse(res, 500, 'Failed to get responses');
+  }
+};
+
+// Merged controller for paginated and search/sort responses
+export const getResponses = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const userID = await getUserId(req, res);
+  if (!userID) return;
+
+  const page = parseInt(req.query.page as string) || 1;
+  const pageSize = parseInt(req.query.pageSize as string) || 10;
+  const search = (req.query.search as string) || '';
+  const sortBy = (req.query.sortBy as string) || 'createdAt';
+  const sortOrder = (req.query.sortOrder as string) === 'asc' ? 'asc' : 'desc';
+
+  try {
+    const form = await getFormById(id);
+    if (form?.userId !== userID) {
+      handleResponse(res, 403, 'You do not have access to this form');
+      return;
+    }
+
+    const result = await getResponsesService(id, page, pageSize, search, sortBy, sortOrder);
+
+    handleResponse(res, 200, 'Responses found', { ...result, page, pageSize });
   } catch (error) {
     console.error('Error getting responses:', error);
     handleResponse(res, 500, 'Failed to get responses');

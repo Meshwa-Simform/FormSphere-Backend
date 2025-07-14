@@ -7,6 +7,7 @@ import { CLIENT_URL, PORT } from './configs/env.config.ts';
 import cors from 'cors';
 import prisma from './configs/db.config.ts';
 import cookieParser from 'cookie-parser';
+import { apiLogger } from './utils/logger.middleware.ts';
 
 const app = express();
 
@@ -21,6 +22,7 @@ app.use(
   }),
 );
 app.use(cookieParser());
+app.use(apiLogger);
 
 app.use('/auth', authRoutes);
 app.use('/forms', formRoutes);

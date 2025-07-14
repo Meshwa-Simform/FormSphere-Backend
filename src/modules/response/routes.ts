@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import multer from 'multer';
-import { createResponse, getResponses, uploadFile } from './controllers.ts';
+import { createResponse, getAllResponses, uploadFile, getResponses } from './controllers.ts';
 
 const router = Router();
 
@@ -12,6 +12,9 @@ const upload = multer({ storage });
 router.post('/upload', upload.single('file'), uploadFile);
 
 router.post('/create', createResponse);
+router.get('/analytics/:id', getAllResponses);
+
+// route for paginated and search/sort responses
 router.get('/:id', getResponses);
 
 export default router;
