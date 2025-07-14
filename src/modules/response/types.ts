@@ -1,3 +1,5 @@
+import { Answer as PrismaAnswer, FormQuestion, FormQuestionOption } from '@prisma/client';
+
 export interface Responses {
   id: string;
   userId: string;
@@ -33,4 +35,22 @@ export interface InputAnswer {
   questionAnswer?: string;
   questionOrder: number;
   responseAnswer: string;
+}
+
+export interface ResponseWithAnswers {
+  id: string;
+  userId: string;
+  formId: string;
+  createdAt: Date;
+  answers: AnswerWithQuestion[];
+  user: {
+    name: string;
+    email: string;
+  };
+}
+
+export interface AnswerWithQuestion extends PrismaAnswer {
+  question: FormQuestion & {
+    options: FormQuestionOption[]; // includes optionText and other fields
+  };
 }

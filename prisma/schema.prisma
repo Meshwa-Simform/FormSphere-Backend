@@ -18,92 +18,187 @@ model User {
   name     String
   email    String @unique
   password String
+  createdAt DateTime @default(now())
 
-  Form Form[]
+  form Form[]
+  responses Response[]
+}
+
+model FormAccess {
+  id       String   @id @default(uuid()) @db.Uuid 
+  formId String @db.Uuid
+  form     Form     @relation(fields: [formId], references: [id], onDelete: Cascade)
+  email  String
 }
 
 model Form {
+  id       String   @id @default(uuid()) @db.Uuid
+  userId   String   @db.Uuid
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  response Response[]
+
+  formAccess FormAccess[]
+  formVersion FormVersion[]
+}
+
+model FormVersion {
   id                  String     @id @default(uuid()) @db.Uuid
-  userId              String     @db.Uuid
-  user                User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  formId              String     @db.Uuid
+  form                Form       @relation(fields: [formId], references: [id], onDelete: Cascade)
+  version             Int        @default(1)
   title               String
   description         String
   logoUrl             String?
-  isSinglePage        Boolean    @default(true)
   noOfPages           Int        @default(1)
-  questions           Question[]
+  questions           FormQuestion[]
   styling             Json?
-  privateSharingToken String?
+  status              FormStatus 
+  accessType          FormAccessType
+  lastDate            DateTime?
+  allowMultipleSubmissions Boolean @default(true)
   createdAt           DateTime   @default(now())
   updatedAt           DateTime   @updatedAt
 
-  ConditionalLogic ConditionalLogic[]
-  Response         Response[]
+  conditionalLogic FormConditionalLogic[]
+  responses        Response[]
 }
+
+enum FormStatus {
+  draft
+  published
+  archived
+}
+
+enum FormAccessType {
+  public
+  private
+}
+
+model FormQuestion {
+  id              String     @id @default(uuid()) @db.Uuid
+  formVersionId   String    @db.Uuid
+  form            FormVersion      @relation(fields: [formVersionId], references: [id], onDelete: Cascade)
+  pageNumber      Int
+  questionType    String
+  questionText    String
+  validations     Json       @default("{}")
+  questionAnswer  String?
+  questionOrder   Int
+
+  condition       LogicCondition?    // "AND" or "OR"
+  action          LogicAction?     // e.g., "show", "hide"
+  createdAt      DateTime  @default(now())
+  options         FormQuestionOption[]
+  conditionalLogic FormConditionalLogic[] @relation("TriggerQuestion") 
+  formConditionalLogic FormConditionalLogic[]
+  answer Answer[]
+}
+
+model FormQuestionOption {
+  id             String   @id @default(uuid()) @db.Uuid
+  questionId String   @db.Uuid
+  optionText     String
+
+  question FormQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+}
+
+model FormConditionalLogic {
+  id                String   @id @default(uuid()) @db.Uuid
+  formVersionId     String   @db.Uuid
+  form              FormVersion     @relation(fields: [formVersionId], references: [id], onDelete: Cascade)
+  questionId        String   @db.Uuid
+  question          FormQuestion @relation("TriggerQuestion", fields: [questionId], references: [id], onDelete: Cascade)
+  operator          String // e.g., "equals", "not_equals", "contains", etc.
+  value             String // e.g., "Yes"
+  action_questionId String   @db.Uuid
+  actionQuestion    FormQuestion @relation(fields: [action_questionId], references: [id], onDelete: Cascade)
+  createdAt         DateTime   @default(now())
+}
+
+model Response {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  formId    String   @db.Uuid
+  form      Form     @relation(fields: [formId], references: [id], onDelete: Cascade)
+  formVersionId   String    @db.Uuid
+  formVersion      FormVersion      @relation(fields: [formVersionId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  answers   Answer[] 
+}
+
+model Answer {
+  id              String   @id @default(uuid()) @db.Uuid
+  responseId      String   @db.Uuid
+  response        Response @relation(fields: [responseId], references: [id], onDelete: Cascade)
+  questionId      String   @db.Uuid
+  question        FormQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  responseAnswer  String
+}
+
 
 model Templates {
   id                  String     @id @default(uuid()) @db.Uuid
   title               String
   description         String
   logoUrl             String?
-  isSinglePage        Boolean    @default(true)
   noOfPages           Int        @default(1)
-  questions           Question[]
+  questions           TemplateQuestion[]
   styling             Json
-  privateSharingToken String?
   createdAt           DateTime   @default(now())
   updatedAt           DateTime   @updatedAt
+
+  templateConditionalLogic TemplateConditionalLogic[]
 }
 
-model Question {
-  id              String     @id @default(uuid()) @db.Uuid
-  formId          String?    @db.Uuid
-  form            Form?      @relation(fields: [formId], references: [id], onDelete: Cascade)
-  templateId      String?    @db.Uuid
-  template        Templates? @relation(fields: [templateId], references: [id], onDelete: Cascade)
+model TemplateQuestion {
+  id              String   @id @default(uuid()) @db.Uuid
+  templateId      String   @db.Uuid
   pageNumber      Int
   questionType    String
   questionText    String
-  questionOptions String[]
-  validations     String[]
   questionAnswer  String?
+  validations     Json
   questionOrder   Int
-  isRequired      Boolean    @default(false)
-  isHidden        Boolean    @default(false)
+  condition       LogicCondition?
+  action          LogicAction?
 
-  ConditionalLogic ConditionalLogic[]
+  template Templates @relation(fields: [templateId], references: [id])
+  options   TemplateQuestionOption[]
+  logicUsedIn TemplateConditionalLogic[] @relation("TemplateActionQuestionRelation")
+  templateConditionalLogic TemplateConditionalLogic[]
 }
 
-model ConditionalLogic {
-  id                String   @id @default(uuid()) @db.Uuid
-  formId            String   @db.Uuid
-  form              Form     @relation(fields: [formId], references: [id], onDelete: Cascade)
-  questionId        String   @db.Uuid
-  question          Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
-  condition_check   String
-  action_questionId String[]
+model TemplateQuestionOption {
+  id                  String   @id @default(uuid()) @db.Uuid
+  questionId  String   @db.Uuid
+  optionText          String
+
+  question TemplateQuestion @relation(fields: [questionId], references: [id])
 }
 
-model Response {
-  id        String   @id @default(uuid()) @db.Uuid
-  userId    String   @db.Uuid
-  userName  String
-  userEmail String
-  formId    String   @db.Uuid
-  form      Form     @relation(fields: [formId], references: [id], onDelete: Cascade)
-  answers   Answer[] @relation("ResponseToAnswer")
-  createdAt DateTime @default(now())
+model TemplateConditionalLogic {
+  id               String            @id @default(uuid()) @db.Uuid
+  templateId       String            @db.Uuid
+  questionId       String            @db.Uuid
+  operator         String
+  value            String
+  action_questionId String           @db.Uuid
+
+  template       Templates         @relation(fields: [templateId], references: [id])
+  question       TemplateQuestion  @relation(fields: [questionId], references: [id])
+  actionQuestion TemplateQuestion  @relation("TemplateActionQuestionRelation", fields: [action_questionId], references: [id])
 }
 
-model Answer {
-  id              String   @id @default(uuid()) @db.Uuid
-  responseId      String   @db.Uuid
-  response        Response @relation("ResponseToAnswer", fields: [responseId], references: [id], onDelete: Cascade)
-  questionId      String   @db.Uuid
-  questionType    String
-  questionText    String
-  questionOptions String[]
-  questionAnswer  String?
-  questionOrder   Int
-  responseAnswer  String
+enum LogicCondition {
+  and
+  or
+}
+
+enum LogicAction {
+  show
+  hide
 }
