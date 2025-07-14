@@ -56,15 +56,7 @@ export const createForm = async (req: Request, res: Response) => {
 
   try {
     const form = await generateForm(formData, userID);
-    const transformedForm = {
-      ...form,
-      questions: form.questions.map((question: any) => ({
-        ...question,
-        ConditionalLogic: question.conditionalLogic,
-        isHidden: question.isHidden || false,
-      })),
-    };
-    handleResponse(res, 201, 'Form created successfully', transformedForm as FormOutput);
+    handleResponse(res, 201, 'Form created successfully', form);
   } catch (error) {
     console.error('Error creating form:', error);
     handleResponse(res, 500, 'Failed to create form');
@@ -88,15 +80,7 @@ export const updateForm = async (req: Request, res: Response) => {
       handleResponse(res, 400, 'Form update failed');
       return;
     }
-    const transformedForm = {
-      ...form,
-      questions: form.questions.map((question: any) => ({
-        ...question,
-        ConditionalLogic: question.conditionalLogic,
-        isHidden: question.isHidden || false,
-      })),
-    };
-    handleResponse(res, 200, 'Form updated successfully', transformedForm as FormOutput);
+    handleResponse(res, 200, 'Form updated successfully', form);
   } catch (error: any) {
     handleResponse(res, 403, error.message || 'Unauthorized or not found');
   }
@@ -113,7 +97,7 @@ export const deleteForm = async (req: Request, res: Response) => {
     handleResponse(res, 400, 'Form deletion failed');
     return;
   }
-  handleResponse(res, 200, 'Form deleted successfully', deletedForm as FormOutput);
+  handleResponse(res, 200, 'Form deleted successfully', deletedForm);
 };
 
 const getUserId = async (req: Request, res: Response) => {
