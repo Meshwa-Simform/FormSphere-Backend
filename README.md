@@ -45,8 +45,8 @@ formsphere_backend/
 
 ## 📊 Database Schema
 
-Below is a overview of the main database tables used in FormSphere:
-![Database Schema](./docs//database_dig.svg)
+Below is an overview of the main database tables used in FormSphere:  
+![Database Schema](./docs/database_dig.svg)
 
 ---
 
@@ -68,8 +68,6 @@ Below is a overview of the main database tables used in FormSphere:
 - **Response Collection**
   - Submit and retrieve form responses
   - File uploads via Cloudinary
-
-
 
 - **API Overview**
   - **Authentication:** Register, login, logout, refresh tokens, and check authentication.
